@@ -19,6 +19,7 @@ if (!uri) {
 
 app.use(cors());
 app.use(express.json());
+app.use(requireDatabase);
 
 app.get('/', (req, res) => {
   res.send({ message: 'House Etech API is running' });

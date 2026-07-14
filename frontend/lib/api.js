@@ -1,10 +1,8 @@
 import axios from 'axios';
 
-const defaultBackendUrl = process.env.NODE_ENV === 'development'
-  ? 'http://localhost:4000'
-  : 'https://house-etech-project.vercel.app';
-
-const baseURL = process.env.NEXT_PUBLIC_API_URL || defaultBackendUrl;
+const baseURL = process.env.NODE_ENV === 'development'
+  ? process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+  : '/api';
 
 const api = axios.create({
   baseURL,
