@@ -2,16 +2,20 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const { MongoClient } = require('mongodb');
+const serverless = require('serverless-http');
 const listingsRouter = require('./routes/listings');
 const contactRouter = require('./routes/contact');
 const authRouter = require('./routes/auth');
 require('dotenv').config();
 
 const app = express();
-const port = process.env.PORT || 4000;
 const uri = process.env.MONGODB_URI;
 const adminEmail = process.env.ADMIN_EMAIL;
 const adminPassword = process.env.ADMIN_PASSWORD;
+
+if (!uri) {
+  throw new Error('MONGODB_URI is not defined in environment variables');
+}
 
 app.use(cors());
 app.use(express.json());
@@ -24,25 +28,40 @@ app.use('/api/auth', authRouter);
 app.use('/api/listings', listingsRouter);
 app.use('/api/contact', contactRouter);
 
-async function startServer() {
-  if (!uri) {
-    throw new Error('MONGODB_URI is not defined in environment variables');
+let cachedClient = global._mongoClient;
+let cachedDb = global._mongoDb;
+
+async function connectToDatabase() {
+  if (cachedClient && cachedDb) {
+    return { client: cachedClient, db: cachedDb };
   }
 
   const client = new MongoClient(uri);
   await client.connect();
-
   const db = client.db();
-  app.locals.db = db;
+
+  cachedClient = client;
+  cachedDb = db;
+  global._mongoClient = client;
+  global._mongoDb = db;
 
   if (adminEmail && adminPassword) {
     await seedAdminUser(db);
   }
 
-  app.listen(port, () => {
-    console.log(`Server listening on http://localhost:${port}`);
-  });
+  return { client, db };
 }
+
+function requireDatabase(req, res, next) {
+  connectToDatabase()
+    .then(({ db }) => {
+      req.app.locals.db = db;
+      next();
+    })
+    .catch(next);
+}
+
+app.use(requireDatabase);
 
 async function seedAdminUser(db) {
   const normalizedEmail = adminEmail.toLowerCase();
@@ -68,7 +87,4 @@ async function seedAdminUser(db) {
   console.log('Seeded admin user:', normalizedEmail);
 }
 
-startServer().catch((error) => {
-  console.error('Failed to start server:', error);
-  process.exit(1);
-});
+module.exports.handler = serverless(app);
