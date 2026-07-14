@@ -9,13 +9,9 @@ const authRouter = require('./routes/auth');
 require('dotenv').config();
 
 const app = express();
-const uri = process.env.MONGODB_URI;
-const adminEmail = process.env.ADMIN_EMAIL;
-const adminPassword = process.env.ADMIN_PASSWORD;
-
-if (!uri) {
-  throw new Error('MONGODB_URI is not defined in environment variables');
-}
+const uri = process.env.MONGODB_URI || '';
+const adminEmail = process.env.ADMIN_EMAIL || '';
+const adminPassword = process.env.ADMIN_PASSWORD || '';
 
 app.use(cors());
 app.use(express.json());
@@ -54,15 +50,21 @@ async function connectToDatabase() {
 }
 
 function requireDatabase(req, res, next) {
+  if (!uri) {
+    console.error('MONGODB_URI is missing. Set the environment variable in Vercel.');
+    return res.status(500).json({ error: 'Database configuration is missing.' });
+  }
+
   connectToDatabase()
     .then(({ db }) => {
       req.app.locals.db = db;
       next();
     })
-    .catch(next);
+    .catch((err) => {
+      console.error('Database connection failed:', err);
+      res.status(500).json({ error: 'Unable to connect to database.' });
+    });
 }
-
-app.use(requireDatabase);
 
 async function seedAdminUser(db) {
   const normalizedEmail = adminEmail.toLowerCase();
