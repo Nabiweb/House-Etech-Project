@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const { MongoClient } = require('mongodb');
-const serverless = require('serverless-http');
 const listingsRouter = require('./routes/listings');
 const contactRouter = require('./routes/contact');
 const authRouter = require('./routes/auth');
@@ -90,4 +89,4 @@ async function seedAdminUser(db) {
   console.log('Seeded admin user:', normalizedEmail);
 }
 
-module.exports.handler = serverless(app);
+module.exports = app;
