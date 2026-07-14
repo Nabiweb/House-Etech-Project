@@ -20,9 +20,21 @@ app.get('/', (req, res) => {
   res.send({ message: 'House Etech API is running' });
 });
 
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
+
 app.use('/api/auth', authRouter);
 app.use('/api/listings', listingsRouter);
 app.use('/api/contact', contactRouter);
+
+app.use((err, req, res, next) => {
+  console.error('Unhandled Express error:', err);
+  if (res.headersSent) {
+    return next(err);
+  }
+  res.status(500).json({ error: 'Internal server error.' });
+});
 
 let cachedClient = global._mongoClient;
 let cachedDb = global._mongoDb;
