@@ -85,7 +85,8 @@
   max-width: 640px;
 }
 
-.contactForm {
+.contactForm,
+.manageForm {
   display: grid;
   gap: 1rem;
 }
@@ -116,7 +117,8 @@
   box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
 }
 
-.contactButton {
+.contactButton,
+.actionButton {
   width: fit-content;
   display: inline-flex;
   padding: 0.9rem 1.4rem;
@@ -129,9 +131,71 @@
   cursor: pointer;
 }
 
-.contactButton:disabled {
+.contactButton:disabled,
+.actionButton:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.manageSection {
+  display: grid;
+  gap: 2rem;
+}
+
+.manageList {
+  display: grid;
+  gap: 1rem;
+}
+
+.manageCard {
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  background: #ffffff;
+  overflow: hidden;
+  box-shadow: 0 12px 35px rgba(15, 23, 42, 0.06);
+}
+
+.manageCardHeader {
+  padding: 1rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.manageCardBody {
+  padding: 1.25rem;
+}
+
+.manageCardBody p {
+  margin: 0.5rem 0;
+  color: #374151;
+}
+
+.manageCardFooter {
+  padding: 1rem 1.25rem;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.cancelButton,
+.deleteButton {
+  width: fit-content;
+  padding: 0.9rem 1.4rem;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+}
+
+.cancelButton {
+  background: #6b7280;
+  color: white;
+}
+
+.deleteButton {
+  background: #dc2626;
+  color: white;
 }
 
 .success {

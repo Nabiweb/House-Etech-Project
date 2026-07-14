@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import Link from 'next/link';
 
 export default function Layout({ children }) {
   return (
@@ -11,8 +12,8 @@ export default function Layout({ children }) {
         <header className="site-header">
           <div className="brand">House Etech</div>
           <nav>
-            <a href="#listings">Listings</a>
-            <a href="#contact">Contact</a>
+            <Link href="/">Home</Link>
+            <Link href="/manage">Manage Listings</Link>
           </nav>
         </header>
         <main>{children}</main>

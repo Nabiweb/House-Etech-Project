@@ -71,7 +71,16 @@ The frontend app will run at `http://localhost:3000`.
 - Frontend URL: `http://localhost:3000`
 - Backend API health: `http://localhost:4000`
 - Listings endpoint: `http://localhost:4000/api/listings`
+- Listing detail endpoint: `http://localhost:4000/api/listings/:id`
+- Create listing: `POST http://localhost:4000/api/listings`
+- Update listing: `PUT http://localhost:4000/api/listings/:id`
+- Delete listing: `DELETE http://localhost:4000/api/listings/:id`
 - Contact endpoint: `http://localhost:4000/api/contact`
+
+### Admin management page
+
+- Visit `http://localhost:3000/manage` to create, edit, and delete property listings.
+- This page uses the same backend CRUD endpoints and performs validation before submission.
 
 ### Seed data
 
