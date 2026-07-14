@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import axios from 'axios';
 import styles from '@styles/Home.module.css';
 
@@ -16,12 +17,21 @@ export default function Manage() {
   const [status, setStatus] = useState(null);
   const [error, setError] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
 
   const selectedListing = useMemo(() => {
     return listings.find((item) => item._id === selected) || null;
   }, [listings, selected]);
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('house-etech-token');
+      setAuthenticated(!!token);
+      if (token) {
+        axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+      }
+    }
+
     fetchListings();
   }, []);
 
@@ -105,6 +115,18 @@ export default function Manage() {
     } catch (err) {
       setError(err.response?.data?.error || 'Unable to delete listing.');
     }
+  }
+
+  if (!authenticated) {
+    return (
+      <div className={styles.contactSection}>
+        <h2>Admin access required</h2>
+        <p>You must sign in before managing listings.</p>
+        <Link href="/login" className={styles.actionButton}>
+          Go to login
+        </Link>
+      </div>
+    );
   }
 
   return (

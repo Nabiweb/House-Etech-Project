@@ -1,5 +1,6 @@
 const express = require('express');
 const { ObjectId } = require('mongodb');
+const { requireAuth, requireRole } = require('../middleware/auth');
 const router = express.Router();
 
 function sanitizeText(value) {
@@ -89,7 +90,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', requireAuth, requireRole('admin'), async (req, res) => {
   const { errors, listing } = validateListingPayload(req.body, true);
 
   if (errors.length) {
@@ -106,7 +107,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireAuth, requireRole('admin'), async (req, res) => {
   const listingId = createObjectId(req.params.id);
   if (!listingId) {
     return res.status(400).json({ error: 'Invalid listing id.' });
@@ -145,7 +146,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAuth, requireRole('admin'), async (req, res) => {
   const listingId = createObjectId(req.params.id);
   if (!listingId) {
     return res.status(400).json({ error: 'Invalid listing id.' });

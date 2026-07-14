@@ -1,7 +1,25 @@
 import Head from 'next/head';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 
 export default function Layout({ children }) {
+  const [authenticated, setAuthenticated] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setAuthenticated(!!localStorage.getItem('house-etech-token'));
+    }
+  }, []);
+
+  function handleLogout() {
+    localStorage.removeItem('house-etech-token');
+    localStorage.removeItem('house-etech-user');
+    setAuthenticated(false);
+    router.push('/login');
+  }
+
   return (
     <>
       <Head>
@@ -14,6 +32,13 @@ export default function Layout({ children }) {
           <nav>
             <Link href="/">Home</Link>
             <Link href="/manage">Manage Listings</Link>
+            {authenticated ? (
+              <button onClick={handleLogout} className="logoutButton">
+                Logout
+              </button>
+            ) : (
+              <Link href="/login">Login</Link>
+            )}
           </nav>
         </header>
         <main>{children}</main>

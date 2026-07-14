@@ -1,13 +1,17 @@
 const express = require('express');
 const cors = require('cors');
+const bcrypt = require('bcryptjs');
 const { MongoClient } = require('mongodb');
 const listingsRouter = require('./routes/listings');
 const contactRouter = require('./routes/contact');
+const authRouter = require('./routes/auth');
 require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 4000;
 const uri = process.env.MONGODB_URI;
+const adminEmail = process.env.ADMIN_EMAIL;
+const adminPassword = process.env.ADMIN_PASSWORD;
 
 app.use(cors());
 app.use(express.json());
@@ -16,6 +20,7 @@ app.get('/', (req, res) => {
   res.send({ message: 'House Etech API is running' });
 });
 
+app.use('/api/auth', authRouter);
 app.use('/api/listings', listingsRouter);
 app.use('/api/contact', contactRouter);
 
@@ -30,9 +35,31 @@ async function startServer() {
   const db = client.db();
   app.locals.db = db;
 
+  if (adminEmail && adminPassword) {
+    await seedAdminUser(db);
+  }
+
   app.listen(port, () => {
     console.log(`Server listening on http://localhost:${port}`);
   });
+}
+
+async function seedAdminUser(db) {
+  const normalizedEmail = adminEmail.toLowerCase();
+  const existing = await db.collection('users').findOne({ email: normalizedEmail });
+  if (existing) {
+    return;
+  }
+
+  const passwordHash = await bcrypt.hash(adminPassword, 10);
+  await db.collection('users').insertOne({
+    email: normalizedEmail,
+    password: passwordHash,
+    role: 'admin',
+    createdAt: new Date()
+  });
+
+  console.log('Seeded admin user:', normalizedEmail);
 }
 
 startServer().catch((error) => {

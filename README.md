@@ -80,7 +80,13 @@ The frontend app will run at `http://localhost:3000`.
 ### Admin management page
 
 - Visit `http://localhost:3000/manage` to create, edit, and delete property listings.
-- This page uses the same backend CRUD endpoints and performs validation before submission.
+- Public access is limited to viewing listings and submitting contact forms.
+- Visit `http://localhost:3000/login` to sign in as an admin before managing listings.
+
+### Authentication endpoints
+
+- `POST /api/auth/login` - log in and receive a JWT
+- `POST /api/auth/register` - register a new admin user
 
 ### Seed data
 
@@ -94,6 +100,23 @@ The backend includes a seed script that inserts sample real estate listings into
 - The frontend uses Next.js rewrites to proxy `/api/*` requests to the backend.
 - The backend stores contact form submissions in the `contacts` collection.
 - Keep `.env` out of source control; it contains environment-specific configuration.
+
+### Authentication and authorization
+
+- Uses JWT-based authentication with `POST /api/auth/login` and `POST /api/auth/register`.
+- Admin users can create, update, and delete property listings.
+- Public visitors can view listings and submit contact forms without logging in.
+- A default admin account can be seeded by setting `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `.env`.
+- The JWT secret is configured with `JWT_SECRET`.
+
+### Security considerations
+
+- Passwords are hashed with bcrypt before storage.
+- JWT tokens expire after a short period and require a strong secret.
+- All user input is sanitized to strip HTML tags and validated before database operations.
+- Authorization rules are enforced server-side to prevent unauthorized listing changes.
+- In production, use HTTPS and protect secrets with environment variables.
+- If a secret is compromised, rotate `JWT_SECRET` and revoke tokens by resetting the secret.
 
 ## Folder details
 

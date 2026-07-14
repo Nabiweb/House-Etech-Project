@@ -50,6 +50,18 @@ body {
   font-weight: 500;
 }
 
+.logoutButton {
+  border: none;
+  background: transparent;
+  color: #2563eb;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.logoutButton:hover {
+  text-decoration: underline;
+}
+
 .site-footer {
   margin-top: 3rem;
   padding-top: 2rem;
