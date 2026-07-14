@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '@lib/api';
 import styles from '@styles/Home.module.css';
 
 export default function Home() {
@@ -15,7 +15,7 @@ export default function Home() {
   useEffect(() => {
     async function loadListings() {
       try {
-        const response = await axios.get('/api/listings');
+        const response = await api.get('/api/listings');
         setListings(response.data || []);
       } catch (err) {
         setError('Failed to load listings.');
@@ -39,7 +39,7 @@ export default function Home() {
     }
 
     try {
-      await axios.post('/api/contact', { name, email, message });
+      await api.post('/api/contact', { name, email, message });
       setSendState('sent');
       setName('');
       setEmail('');

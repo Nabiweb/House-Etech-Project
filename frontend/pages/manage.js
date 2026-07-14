@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import axios from 'axios';
+import api from '@lib/api';
 import styles from '@styles/Home.module.css';
 
 const emptyListing = {
@@ -50,7 +50,7 @@ export default function Manage() {
 
   async function fetchListings() {
     try {
-      const response = await axios.get('/api/listings');
+      const response = await api.get('/api/listings');
       setListings(response.data || []);
     } catch (err) {
       setError('Unable to load listings.');
@@ -86,7 +86,7 @@ export default function Manage() {
     try {
       const method = selected ? 'put' : 'post';
       const url = selected ? `/api/listings/${selected}` : '/api/listings';
-      const response = await axios[method](url, payload);
+      const response = await api[method](url, payload);
       setStatus(selected ? 'Listing updated.' : 'Listing created.');
       setListings((prev) => {
         if (selected) {
@@ -106,7 +106,7 @@ export default function Manage() {
     setError(null);
     setStatus(null);
     try {
-      await axios.delete(`/api/listings/${id}`);
+      await api.delete(`/api/listings/${id}`);
       setListings((prev) => prev.filter((item) => item._id !== id));
       if (id === selected) {
         resetForm();

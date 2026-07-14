@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import api, { setAuthToken } from '@lib/api';
 import { useRouter } from 'next/router';
 import styles from '@styles/Home.module.css';
 
@@ -22,10 +22,10 @@ export default function Login() {
     }
 
     try {
-      const response = await axios.post('/api/auth/login', { email, password });
+      const response = await api.post('/api/auth/login', { email, password });
       localStorage.setItem('house-etech-token', response.data.token);
       localStorage.setItem('house-etech-user', JSON.stringify({ email: response.data.email, role: response.data.role }));
-      axios.defaults.headers.common.Authorization = `Bearer ${response.data.token}`;
+      setAuthToken(response.data.token);
       router.push('/manage');
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed.');
