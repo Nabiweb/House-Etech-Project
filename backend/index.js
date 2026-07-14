@@ -46,12 +46,18 @@ async function startServer() {
 
 async function seedAdminUser(db) {
   const normalizedEmail = adminEmail.toLowerCase();
+  const passwordHash = await bcrypt.hash(adminPassword, 10);
   const existing = await db.collection('users').findOne({ email: normalizedEmail });
+
   if (existing) {
+    await db.collection('users').updateOne(
+      { _id: existing._id },
+      { $set: { password: passwordHash, role: 'admin' } }
+    );
+    console.log('Updated admin user credentials:', normalizedEmail);
     return;
   }
 
-  const passwordHash = await bcrypt.hash(adminPassword, 10);
   await db.collection('users').insertOne({
     email: normalizedEmail,
     password: passwordHash,
