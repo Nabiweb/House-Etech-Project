@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const { MongoClient } = require('mongodb');
+const serverless = require('serverless-http');
 const listingsRouter = require('./routes/listings');
 const contactRouter = require('./routes/contact');
 const authRouter = require('./routes/auth');
@@ -24,6 +25,17 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
+app.get('/debug-db', async (req, res) => {
+  try {
+    const { db } = await connectToDatabase();
+    const listingsCount = await db.collection('listings').countDocuments();
+    res.json({ ok: true, listingsCount });
+  } catch (err) {
+    console.error('Debug DB error:', err);
+    res.status(500).json({ ok: false, error: process.env.NODE_ENV === 'production' ? 'Database error' : err.message });
+  }
+});
+
 app.use('/api/auth', authRouter);
 app.use('/api/listings', listingsRouter);
 app.use('/api/contact', contactRouter);
@@ -40,6 +52,10 @@ let cachedClient = global._mongoClient;
 let cachedDb = global._mongoDb;
 
 async function connectToDatabase() {
+  if (!uri) {
+    throw new Error('MONGODB_URI is not configured');
+  }
+
   if (cachedClient && cachedDb) {
     return { client: cachedClient, db: cachedDb };
   }
@@ -101,4 +117,11 @@ async function seedAdminUser(db) {
   console.log('Seeded admin user:', normalizedEmail);
 }
 
-module.exports = app;
+if (require.main === module) {
+  const port = process.env.PORT || 4000;
+  app.listen(port, () => console.log(`Server listening on ${port}`));
+}
+
+const handler = serverless(app);
+module.exports = handler;
+module.exports.handler = handler;

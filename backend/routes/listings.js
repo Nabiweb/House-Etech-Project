@@ -67,7 +67,8 @@ router.get('/', async (req, res) => {
     res.json(listings);
   } catch (error) {
     console.error('Error fetching listings:', error);
-    res.status(500).json({ error: 'Unable to load listings' });
+    const msg = process.env.NODE_ENV === 'production' ? 'Unable to load listings' : error.message;
+    res.status(500).json({ error: msg });
   }
 });
 
@@ -86,7 +87,8 @@ router.get('/:id', async (req, res) => {
     res.json(listing);
   } catch (error) {
     console.error('Error fetching listing:', error);
-    res.status(500).json({ error: 'Unable to load listing.' });
+    const msg = process.env.NODE_ENV === 'production' ? 'Unable to load listing.' : error.message;
+    res.status(500).json({ error: msg });
   }
 });
 
@@ -103,7 +105,8 @@ router.post('/', requireAuth, requireRole('admin'), async (req, res) => {
     res.status(201).json({ ...listing, _id: result.insertedId });
   } catch (error) {
     console.error('Error creating listing:', error);
-    res.status(500).json({ error: 'Unable to create listing.' });
+    const msg = process.env.NODE_ENV === 'production' ? 'Unable to create listing.' : error.message;
+    res.status(500).json({ error: msg });
   }
 });
 
@@ -142,7 +145,8 @@ router.put('/:id', requireAuth, requireRole('admin'), async (req, res) => {
     res.json(updated);
   } catch (error) {
     console.error('Error updating listing:', error);
-    res.status(500).json({ error: 'Unable to update listing.' });
+    const msg = process.env.NODE_ENV === 'production' ? 'Unable to update listing.' : error.message;
+    res.status(500).json({ error: msg });
   }
 });
 
@@ -161,7 +165,8 @@ router.delete('/:id', requireAuth, requireRole('admin'), async (req, res) => {
     res.status(204).end();
   } catch (error) {
     console.error('Error deleting listing:', error);
-    res.status(500).json({ error: 'Unable to delete listing.' });
+    const msg = process.env.NODE_ENV === 'production' ? 'Unable to delete listing.' : error.message;
+    res.status(500).json({ error: msg });
   }
 });
 
